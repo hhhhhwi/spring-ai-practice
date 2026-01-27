@@ -1,43 +1,27 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.1'
+    id 'org.springframework.boot' version '3.4.13'
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
 repositories {
-    mavenCentral()
-
-     // Spring AI는 여기서만 내려받을 수 있음
-    maven {
-        url 'https://repo.spring.io/milestone'
-    }
-}
-
-dependencyManagement {
-    imports {
-        // Spring AI BOM (존재하는 안정 버전)
-        mavenBom "org.springframework.ai:spring-ai-bom:0.8.0"
-    }
+  mavenCentral()
+  maven { url 'https://repo.spring.io/milestone' }
+  maven { url 'https://repo.spring.io/snapshot' }
+  maven {
+    name = 'Spring AI Snapshots'
+    url = 'https://repo.spring.io/snapshot'
+  }
 }
 
 dependencies {
-
-    // Spring Web (MVC 포함)
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M4")
+    implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
 
-    // Spring AI - OpenAI
-    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-
-    // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
