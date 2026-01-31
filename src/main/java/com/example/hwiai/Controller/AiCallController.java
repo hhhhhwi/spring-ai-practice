@@ -1,4 +1,4 @@
-package com.example.hwiai.Controller;
+package com.example.hwiai.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.RestController;

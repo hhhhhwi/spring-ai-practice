@@ -23,6 +23,9 @@ dependencies {
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-M4")
     implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
     
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
