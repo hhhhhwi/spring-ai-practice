@@ -17,7 +17,7 @@ public class CharacteristicSummaryController {
         int sum = 0;
         String returnString = "";
 
-        for (ReboundSummaryDto reboundSummaryDto : characteristicSummaryService.analyzeCharacteristics()) {
+        for (ReboundSummaryDto reboundSummaryDto : characteristicSummaryService.analyzeCharacteristics(1L)) {
             returnString += "! " + sum + "\n";
             if (reboundSummaryDto.isRebound_related()) {
                 sum += Sentiment.getScoreByName(reboundSummaryDto.getSentiment());
@@ -28,6 +28,7 @@ public class CharacteristicSummaryController {
         }
 
         returnString += "\n" + "SUM : " + sum + "\n";
+        characteristicSummaryService.saveCharacteristicSummary(1L, sum);
         return returnString;
     }
 
