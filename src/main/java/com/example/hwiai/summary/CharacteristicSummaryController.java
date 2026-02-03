@@ -1,9 +1,11 @@
 package com.example.hwiai.summary;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.hwiai.summary.dto.ReboundSummaryDto;
+import com.example.hwiai.summary.dto.ReboundSummaryRequest;
 
 import lombok.AllArgsConstructor;
 
@@ -16,8 +18,8 @@ public class CharacteristicSummaryController {
     public String getSummary() {
         int sum = 0;
         String returnString = "";
-
-        for (ReboundSummaryDto reboundSummaryDto : characteristicSummaryService.analyzeCharacteristics(1L)) {
+        List<ReboundSummaryRequest> reviews = characteristicSummaryService.analyzeCharacteristics(1L);
+        for (ReboundSummaryRequest reboundSummaryDto : reviews) {
             returnString += "! " + sum + "\n";
             if (reboundSummaryDto.isRebound_related()) {
                 sum += Sentiment.getScoreByName(reboundSummaryDto.getSentiment());
@@ -28,7 +30,7 @@ public class CharacteristicSummaryController {
         }
 
         returnString += "\n" + "SUM : " + sum + "\n";
-        characteristicSummaryService.saveCharacteristicSummary(1L, sum);
+        characteristicSummaryService.saveCharacteristicSummary(1L, sum, reviews.size());
         return returnString;
     }
 

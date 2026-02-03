@@ -12,7 +12,7 @@ import com.example.hwiai.product.Product;
 import com.example.hwiai.product.ProductRepository;
 import com.example.hwiai.review.Review;
 import com.example.hwiai.review.ReviewRepository;
-import com.example.hwiai.summary.dto.ReboundSummaryDto;
+import com.example.hwiai.summary.dto.ReboundSummaryRequest;
 
 @Service
 public class CharacteristicSummaryService {
@@ -29,7 +29,7 @@ public class CharacteristicSummaryService {
     this.chatClient = chatClientBuilder.build();
   }
 
-  public List<ReboundSummaryDto> analyzeCharacteristics(Long productId) {
+  public List<ReboundSummaryRequest> analyzeCharacteristics(Long productId) {
     List<Review> reviews = reviewRepository.findByProductId(productId);
 
     if (reviews.size() == 0) {
@@ -37,7 +37,7 @@ public class CharacteristicSummaryService {
     }
 
     // 출력 컨버터 설정
-    var outputConverter = new BeanOutputConverter<>(new ParameterizedTypeReference<List<ReboundSummaryDto>>() {
+    var outputConverter = new BeanOutputConverter<>(new ParameterizedTypeReference<List<ReboundSummaryRequest>>() {
     });
 
     String prompt = """
@@ -81,11 +81,11 @@ public class CharacteristicSummaryService {
         .entity(outputConverter);
   }
 
-  public void saveCharacteristicSummary(Long productId, double averageScore) {
+  public void saveCharacteristicSummary(Long productId, double averageScore, int reviewCount) {
     Product product = productRepository.findById(productId)
         .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
 
-    CharacteristicSummary summary = new CharacteristicSummary(product, averageScore);
+    CharacteristicSummary summary = new CharacteristicSummary(product, averageScore, reviewCount);
     characteristicSummaryRepository.save(summary);
   }
 }

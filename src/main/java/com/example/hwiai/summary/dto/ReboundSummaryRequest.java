@@ -1,13 +1,13 @@
 package com.example.hwiai.summary.dto;
 
-public class ReboundSummaryDto {
+public class ReboundSummaryRequest {
     private boolean rebound_related;
 
     private String sentiment;
 
     private String phrase;
 
-    public ReboundSummaryDto(boolean rebound_related, String sentiment, String phrase) {
+    public ReboundSummaryRequest(boolean rebound_related, String sentiment, String phrase) {
         this.rebound_related = rebound_related;
         this.sentiment = sentiment;
         this.phrase = phrase;
