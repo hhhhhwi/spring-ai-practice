@@ -2,6 +2,8 @@ package com.example.hwiai.review;
 
 import com.example.hwiai.entity.BaseEntity;
 import com.example.hwiai.product.Product;
+import com.example.hwiai.util.AnalyzeValue;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(AnalyzeValue.class)
     private Long id;
 
     @ManyToOne
@@ -26,13 +29,18 @@ public class Review extends BaseEntity {
     private Product product;
 
     @Column(columnDefinition = "TEXT")
+    @JsonView(AnalyzeValue.class)
     private String text;
 
-    private int scoreValue; // 추후 구체화하여 정규화
+    private boolean isAggregated;
 
-    public Review(Product product, String text, int scoreValue) {
+    public Review(Product product, String text) {
         this.product = product;
         this.text = text;
-        this.scoreValue = scoreValue;
+        this.isAggregated = text == null || text.isEmpty();
+    }
+
+    public void markAsAggregated() {
+        this.isAggregated = true;
     }
 }
