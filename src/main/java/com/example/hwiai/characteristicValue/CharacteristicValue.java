@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristic;
+package com.example.hwiai.characteristicValue;
 
 import com.example.hwiai.entity.BaseEntity;
 import com.example.hwiai.review.Review;

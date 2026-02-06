@@ -1,9 +1,9 @@
-package com.example.hwiai.characteristic.controller;
+package com.example.hwiai.characteristicValue.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.hwiai.characteristic.CharacteristicValueService;
+import com.example.hwiai.characteristicValue.CharacteristicValueService;
 
 import lombok.AllArgsConstructor;
 

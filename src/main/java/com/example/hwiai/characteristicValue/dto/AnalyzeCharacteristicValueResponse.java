@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristic.dto;
+package com.example.hwiai.characteristicValue.dto;
 
 public class AnalyzeCharacteristicValueResponse {
     private Long reviewId;

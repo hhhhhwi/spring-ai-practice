@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristic;
+package com.example.hwiai.characteristicValue;
 
 public enum Sentiment {
     STRONG_POSITIVE(5),

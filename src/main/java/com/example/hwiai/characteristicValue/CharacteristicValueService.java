@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristic;
+package com.example.hwiai.characteristicValue;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,7 +8,7 @@ import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
-import com.example.hwiai.characteristic.dto.AnalyzeCharacteristicValueResponse;
+import com.example.hwiai.characteristicValue.dto.AnalyzeCharacteristicValueResponse;
 import com.example.hwiai.review.Review;
 import com.example.hwiai.review.ReviewRepository;
 import com.example.hwiai.util.AnalyzeValue;
