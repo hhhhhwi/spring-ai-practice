@@ -1,6 +1,6 @@
-package com.example.hwiai.characteristicValue.dto;
+package com.example.hwiai.evaluation.dto;
 
-public class AnalyzeCharacteristicValueResponse {
+public class EvaluationResponse {
     private Long reviewId;
 
     private boolean isRelated;
@@ -9,7 +9,7 @@ public class AnalyzeCharacteristicValueResponse {
 
     private String phrase;
 
-    public AnalyzeCharacteristicValueResponse(Long reviewId, boolean isRelated, int value, String phrase) {
+    public EvaluationResponse(Long reviewId, boolean isRelated, int value, String phrase) {
         this.reviewId = reviewId;
         this.isRelated = isRelated;
         this.value = value;

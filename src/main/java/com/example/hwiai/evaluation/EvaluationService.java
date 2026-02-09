@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristicValue;
+package com.example.hwiai.evaluation;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,7 +8,7 @@ import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
-import com.example.hwiai.characteristicValue.dto.AnalyzeCharacteristicValueResponse;
+import com.example.hwiai.evaluation.dto.EvaluationResponse;
 import com.example.hwiai.review.Review;
 import com.example.hwiai.review.ReviewRepository;
 import com.example.hwiai.util.AnalyzeValue;
@@ -16,14 +16,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class CharacteristicValueService {
+public class EvaluationService {
     private final ChatClient chatClient;
     private final ReviewRepository reviewRepository;
-    private final CharacteristicValueRepository characteristicValueRepository;
+    private final EvaluationRepository characteristicValueRepository;
     private ObjectMapper objectMapper;
 
-    public CharacteristicValueService(ChatClient.Builder chatClientBuilder, ReviewRepository reviewRepository,
-            CharacteristicValueRepository characteristicValueRepository, ObjectMapper objectMapper) {
+    public EvaluationService(ChatClient.Builder chatClientBuilder, ReviewRepository reviewRepository,
+            EvaluationRepository characteristicValueRepository, ObjectMapper objectMapper) {
         this.chatClient = chatClientBuilder.build();
         this.reviewRepository = reviewRepository;
         this.characteristicValueRepository = characteristicValueRepository;
@@ -31,23 +31,23 @@ public class CharacteristicValueService {
     }
 
     public int getAnalyzedCharacteristicValue(Long productId) {
-        List<CharacteristicValue> characteristicValues = characteristicValueRepository.findByReviewProductId(productId);
+        List<Evaluation> characteristicValues = characteristicValueRepository.findByReviewProductId(productId);
 
         if (characteristicValues.size() == 0) {
             throw new RuntimeException("No characteristic values found for product ID: " + productId);
         }
 
         return (int) characteristicValues.stream()
-                .filter(CharacteristicValue::isRelated)
-                .mapToInt(CharacteristicValue::getValue)
+                .filter(Evaluation::isRelated)
+                .mapToInt(Evaluation::getValue)
                 .average()
                 .orElse(0.0);
     }
 
-    public List<CharacteristicValue> saveAnalyzeCharacteristicValue(Long productId) {
-        List<AnalyzeCharacteristicValueResponse> analyzeCharacteristicValueResponses = analyzeCharacteristicValue(productId);
+    public List<Evaluation> saveAnalyzeCharacteristicValue(Long productId) {
+        List<EvaluationResponse> analyzeCharacteristicValueResponses = analyzeCharacteristicValue(productId);
         
-        List<CharacteristicValue> characteristicValues = analyzeCharacteristicValueResponses.stream()
+        List<Evaluation> characteristicValues = analyzeCharacteristicValueResponses.stream()
                 .map(x -> {
                     Review review = reviewRepository.findById(x.getReviewId())
                             .orElseThrow(() -> new RuntimeException("Review not found with id: " + x.getReviewId()));
@@ -56,13 +56,13 @@ public class CharacteristicValueService {
                     review.markAsAggregated();
                     reviewRepository.save(review);
 
-                    return new CharacteristicValue(review, x.isRelated(), x.getValue(), x.getPhrase());
+                    return new Evaluation(review, x.isRelated(), x.getValue(), x.getPhrase());
                 })
                 .collect(Collectors.toList());
         return characteristicValueRepository.saveAll(characteristicValues);
     }
 
-    public List<AnalyzeCharacteristicValueResponse> analyzeCharacteristicValue(Long productId) {
+    public List<EvaluationResponse> analyzeCharacteristicValue(Long productId) {
         List<Review> reviews = reviewRepository.findByProductIdAndIsAggregated(productId, false);
 
         if (reviews.size() == 0) {
@@ -71,7 +71,7 @@ public class CharacteristicValueService {
 
         // 출력 컨버터 설정
         var outputConverter = new BeanOutputConverter<>(
-                new ParameterizedTypeReference<List<AnalyzeCharacteristicValueResponse>>() {
+                new ParameterizedTypeReference<List<EvaluationResponse>>() {
                 });
 
         String prompt = """
