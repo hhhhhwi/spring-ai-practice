@@ -30,7 +30,7 @@ public class CharacteristicValueService {
         this.objectMapper = objectMapper;
     }
 
-    public int getAverageCharacteristicValue(Long productId) {
+    public int getAnalyzedCharacteristicValue(Long productId) {
         List<CharacteristicValue> characteristicValues = characteristicValueRepository.findByReviewProductId(productId);
 
         if (characteristicValues.size() == 0) {

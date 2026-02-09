@@ -12,9 +12,9 @@ import lombok.AllArgsConstructor;
 public class CharacteristicValueController {
     private CharacteristicValueService characteristicValueService;
 
-    @GetMapping("/analyzeCharacteristicValue")
+    @GetMapping("/analyzedCharacteristicValue")
     public int analyzeCharacteristicValue() {
         characteristicValueService.saveAnalyzeCharacteristicValue(1L);
-        return characteristicValueService.getAverageCharacteristicValue(1L);
+        return characteristicValueService.getAnalyzedCharacteristicValue(1L);
     }
 }
