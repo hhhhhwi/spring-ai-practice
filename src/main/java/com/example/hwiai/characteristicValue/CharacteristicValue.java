@@ -1,6 +1,6 @@
 package com.example.hwiai.characteristicValue;
 
-import com.example.hwiai.characteristicType.CharacteristicType;
+import com.example.hwiai.characteristic.Characteristic;
 import com.example.hwiai.entity.BaseEntity;
 import com.example.hwiai.review.Review;
 
@@ -29,8 +29,8 @@ public class CharacteristicValue extends BaseEntity {
     private boolean isRelated;
 
     @ManyToOne
-    @JoinColumn(name = "characteristic_type_id", nullable = false)
-    private CharacteristicType characteristicType;
+    @JoinColumn(name = "characteristic_id", nullable = false)
+    private Characteristic characteristic;
 
     @Column(name = "score_value")
     private int value;

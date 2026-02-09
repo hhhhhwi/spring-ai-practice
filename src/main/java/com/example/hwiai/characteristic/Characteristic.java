@@ -1,4 +1,4 @@
-package com.example.hwiai.characteristicType;
+package com.example.hwiai.characteristic;
 
 import com.example.hwiai.entity.BaseEntity;
 
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class CharacteristicType extends BaseEntity {
+public class Characteristic extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
