@@ -1,12 +1,14 @@
-package com.example.hwiai.review;
+package com.example.hwiai.review.service;
 
 import org.springframework.stereotype.Service;
 
 import com.example.hwiai.evaluation.Evaluation;
-import com.example.hwiai.evaluation.EvaluationRepository;
+import com.example.hwiai.evaluation.repository.EvaluationRepository;
 import com.example.hwiai.product.Product;
-import com.example.hwiai.product.ProductRepository;
+import com.example.hwiai.product.repository.ProductRepository;
+import com.example.hwiai.review.Review;
 import com.example.hwiai.review.dto.ReviewRequest;
+import com.example.hwiai.review.repository.ReviewRepository;
 
 @Service
 public class ReviewService {

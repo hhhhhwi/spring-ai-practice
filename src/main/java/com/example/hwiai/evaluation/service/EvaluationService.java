@@ -1,4 +1,4 @@
-package com.example.hwiai.evaluation;
+package com.example.hwiai.evaluation.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,9 +8,11 @@ import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
+import com.example.hwiai.evaluation.Evaluation;
 import com.example.hwiai.evaluation.dto.EvaluationResponse;
+import com.example.hwiai.evaluation.repository.EvaluationRepository;
 import com.example.hwiai.review.Review;
-import com.example.hwiai.review.ReviewRepository;
+import com.example.hwiai.review.repository.ReviewRepository;
 import com.example.hwiai.util.AnalyzeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

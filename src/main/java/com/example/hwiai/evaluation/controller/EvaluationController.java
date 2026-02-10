@@ -3,7 +3,7 @@ package com.example.hwiai.evaluation.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.hwiai.evaluation.EvaluationService;
+import com.example.hwiai.evaluation.service.EvaluationService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;

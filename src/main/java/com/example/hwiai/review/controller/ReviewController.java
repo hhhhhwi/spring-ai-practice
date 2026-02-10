@@ -3,8 +3,8 @@ package com.example.hwiai.review.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.hwiai.review.ReviewService;
 import com.example.hwiai.review.dto.ReviewRequest;
+import com.example.hwiai.review.service.ReviewService;
 
 import lombok.AllArgsConstructor;
 
