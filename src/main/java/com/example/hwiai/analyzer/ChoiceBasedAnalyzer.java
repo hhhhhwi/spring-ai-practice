@@ -1,28 +1,46 @@
 package com.example.hwiai.analyzer;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.stereotype.Component;
 
 import com.example.hwiai.analyzer.dto.AnalyzedResponse;
 import com.example.hwiai.characteristic.Characteristic;
+import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.characteristic.repository.CharacteristicOptionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class ChoiceBasedAnalyzer extends BaseAnalyzer {
+import java.util.List;
+import com.example.hwiai.review.Review;
+
+@Component
+public class ChoiceBasedAnalyzer extends BaseAnalyzer {
     private final CharacteristicOptionRepository characteristicOptionRepository;
 
-    public ChoiceBasedAnalyzer(Characteristic characteristic, ChatClient.Builder chatClientBuilder
-        , ObjectMapper objectMapper, CharacteristicOptionRepository characteristicOptionRepository) {
-        super(characteristic, chatClientBuilder, objectMapper);
+    public ChoiceBasedAnalyzer(ChatClient.Builder chatClientBuilder,
+                               ObjectMapper objectMapper,
+                               CharacteristicOptionRepository characteristicOptionRepository) {
+        super(chatClientBuilder, objectMapper);
         this.characteristicOptionRepository = characteristicOptionRepository;
     }
-    
+
     @Override
-    public abstract String getPrompt();
+    public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
+        List<AnalyzedResponse> results = super.analyze(characteristic, reviews);
+        // validate against characteristic options
+        return results.stream()
+                .filter(r -> characteristicOptionRepository.findByCharacteristicId(characteristic.getId())
+                        .stream()
+                        .anyMatch(opt -> opt.validate(r.getChoiceValue())))
+                .toList();
+    }
 
     @Override
     public boolean validate(AnalyzedResponse response) {
-        return characteristicOptionRepository.findByCharacteristicId(getCharacteristic().getId())
-            .stream()
-            .anyMatch(x -> x.validate(response.getChoiceValue()));
+        return true; // validation is done in analyze() with characteristic context
+    }
+
+    @Override
+    public boolean supports(ValueType valueType) {
+        return valueType.equals(ValueType.CHOICE);
     }
 }

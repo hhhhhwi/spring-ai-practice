@@ -9,33 +9,23 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import com.example.hwiai.analyzer.dto.AnalyzedResponse;
 import com.example.hwiai.characteristic.Characteristic;
+import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.review.Review;
 import com.example.hwiai.util.AnalyzeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BaseAnalyzer implements CharacteristicAnalyzer {
-    private final Characteristic characteristic;
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
 
-    protected BaseAnalyzer(Characteristic characteristic, ChatClient.Builder chatClientBuilder
-        , ObjectMapper objectMapper) {
-        this.characteristic = characteristic;
+    protected BaseAnalyzer(ChatClient.Builder chatClientBuilder, ObjectMapper objectMapper) {
         this.chatClient = chatClientBuilder.build();
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Characteristic getCharacteristic() {
-        return characteristic;
-    }
-
-    @Override
-    public abstract String getPrompt();
-
-    @Override
-    public List<AnalyzedResponse> analyze(List<Review> reviews) {
+    public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
         var outputConverter = new BeanOutputConverter<>(
                 new ParameterizedTypeReference<List<AnalyzedResponse>>() {
                 });
@@ -47,9 +37,9 @@ public abstract class BaseAnalyzer implements CharacteristicAnalyzer {
 
             return chatClient
                     .prompt()
-                    .user(u -> u.text(getPrompt())
-                            .param("sentences", sentences) // 데이터 주입
-                            .param("format", outputConverter.getFormat())) // 변환 지시어 주입
+                    .user(u -> u.text(characteristic.getPrompt())
+                            .param("sentences", sentences)
+                            .param("format", outputConverter.getFormat()))
                     .call()
                     .entity(outputConverter)
                     .stream()
@@ -62,4 +52,7 @@ public abstract class BaseAnalyzer implements CharacteristicAnalyzer {
 
     @Override
     public abstract boolean validate(AnalyzedResponse analyzedResponse);
+
+    @Override
+    public abstract boolean supports(ValueType valueType);
 }
