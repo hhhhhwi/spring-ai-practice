@@ -14,12 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EvaluationController {
     private EvaluationService characteristicValueService;
 
-    @GetMapping("/analyzedCharacteristicValue")
-    public int analyzeCharacteristicValue() {
-        characteristicValueService.saveAnalyzeCharacteristicValue(1L);
-        return characteristicValueService.getAnalyzedCharacteristicValue(1L);
-    }
-
     @GetMapping("/product/{productId}/characteristics")
     public String getMethodName(@RequestParam Long productId) {
 

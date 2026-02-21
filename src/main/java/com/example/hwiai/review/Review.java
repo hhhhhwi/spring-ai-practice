@@ -43,4 +43,8 @@ public class Review extends BaseEntity {
     public void markAsAggregated() {
         this.isAggregated = true;
     }
+
+    public boolean equalsById(Long reviewId) {
+        return this.id.equals(reviewId);
+    }
 }

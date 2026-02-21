@@ -11,8 +11,6 @@ public class AnalyzedResponse {
 
     private String phrase;
 
-    
-
     public AnalyzedResponse(Long reviewId, boolean isRelated, int scoreValue, String choiceValue, String phrase) {
         this.reviewId = reviewId;
         this.isRelated = isRelated;

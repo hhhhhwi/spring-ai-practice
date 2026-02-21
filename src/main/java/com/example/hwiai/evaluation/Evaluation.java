@@ -32,23 +32,38 @@ public class Evaluation extends BaseEntity {
     @JoinColumn(name = "characteristic_id", nullable = false)
     private Characteristic characteristic;
 
-    @Column(name = "score_value")
-    private int value;
+    private int scoreValue;
+
+    private String stringValue;
 
     @Column(columnDefinition = "TEXT")
     private String phrase;
 
-    // 사용자가 직접 입력한 점수
-    public Evaluation(Review review, int value) {
+    public Evaluation(Review review, int scoreValue) {
         this.review = review;
-        this.value = value;
+        this.scoreValue = scoreValue;
+    }
+
+    public Evaluation(Review review, String stringValue) {
+        this.review = review;
+        this.stringValue = stringValue;
     }
 
     // 사용자가 입력한 리뷰 텍스트로부터 AI가 분석, 도출한 점수
-    public Evaluation(Review review, boolean isRelated, int value, String phrase) {
+    public Evaluation(Review review, boolean isRelated, Characteristic characteristic, int scoreValue, String phrase) {
         this.review = review;
         this.isRelated = isRelated;
-        this.value = value;
+        this.characteristic = characteristic;
+        this.scoreValue = scoreValue;
+        this.phrase = phrase;
+    }
+
+
+    public Evaluation(Review review, boolean isRelated, Characteristic characteristic, String stringValue, String phrase) {
+        this.review = review;
+        this.isRelated = isRelated;
+        this.characteristic = characteristic;
+        this.stringValue = null;
         this.phrase = phrase;
     }
 }
