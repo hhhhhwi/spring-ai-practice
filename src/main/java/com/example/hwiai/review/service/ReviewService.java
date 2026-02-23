@@ -1,5 +1,7 @@
 package com.example.hwiai.review.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.example.hwiai.evaluation.Evaluation;
@@ -23,6 +25,15 @@ public class ReviewService {
         this.characteristicValueRepository = characteristicValueRepository;
     }
 
+    public List<Review> findByProductIdAndIsAggregated(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductIdAndIsAggregated(productId, false);
+
+        if (reviews.size() == 0) {
+            throw new RuntimeException("No reviews found for product ID: " + productId);
+        }
+
+        return reviews;
+    }
 
     public void saveReview(ReviewRequest request) {
         Long productId = request.getProductId();
