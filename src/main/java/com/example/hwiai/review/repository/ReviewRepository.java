@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.hwiai.review.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findByProductIdAndIsAggregated(Long productId, boolean isAggregated);
+    List<Review> findByProductIdAndTextIsNotNull(Long productId);
 }

@@ -11,12 +11,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(
+    name = "uk_evaluation_review_characteristic",
+    columnNames = {"review_id", "characteristic_id"}
+))
 public class Evaluation extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

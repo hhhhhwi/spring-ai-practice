@@ -11,13 +11,15 @@ import com.example.hwiai.evaluation.repository.EvaluationRepository;
 public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
 
-    
-
     public EvaluationService(EvaluationRepository evaluationRepository) {
         this.evaluationRepository = evaluationRepository;
     }
 
     public void saveAll(List<Evaluation> evaluations) {
         evaluationRepository.saveAll(evaluations);
+    }
+
+    public boolean existsByReviewIdAndCharacteristicId(Long productId, Long characteristicId) {
+        return evaluationRepository.existsByReviewIdAndCharacteristicId(productId, characteristicId);
     }
 }
