@@ -32,17 +32,11 @@ public class Review extends BaseEntity {
     @JsonView(AnalyzeValue.class)
     private String text;
 
-    private boolean isAggregated;
-
     public Review(Product product, String text) {
         this.product = product;
         this.text = text;
-        this.isAggregated = text == null || text.isEmpty();
     }
 
-    public void markAsAggregated() {
-        this.isAggregated = true;
-    }
 
     public boolean equalsById(Long reviewId) {
         return this.id.equals(reviewId);

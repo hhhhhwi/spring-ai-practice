@@ -25,11 +25,11 @@ public class ReviewService {
         this.characteristicValueRepository = characteristicValueRepository;
     }
 
-    public List<Review> findByProductIdAndIsAggregated(Long productId) {
-        List<Review> reviews = reviewRepository.findByProductIdAndIsAggregated(productId, false);
+    public List<Review> findByProductIdAndTextIsNotNull(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductIdAndTextIsNotNull(productId);
 
         if (reviews.size() == 0) {
-            throw new RuntimeException("No reviews found for product ID: " + productId);
+            throw new RuntimeException("No reviews with text found for product ID: " + productId);
         }
 
         return reviews;

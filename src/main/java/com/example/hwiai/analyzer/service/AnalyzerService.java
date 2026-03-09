@@ -17,7 +17,9 @@ import com.example.hwiai.review.Review;
 import com.example.hwiai.review.service.ReviewService;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class AnalyzerService {
     private final ReviewService reviewService;
@@ -34,9 +36,9 @@ public class AnalyzerService {
     }
 
     @Transactional
-    public void analyze(long productId) {
+    public void analyze(Long productId) {
         // 분석할 리뷰들 가져오기, 검증
-        List<Review> reviews = reviewService.findByProductIdAndIsAggregated(productId);
+        List<Review> reviews = reviewService.findByProductIdAndTextIsNotNull(productId);
 
         Map<Long, Review> reviewById = reviews.stream()
         .collect(Collectors.toMap(Review::getId, review -> review));
@@ -49,6 +51,12 @@ public class AnalyzerService {
         for (Characteristic characteristic : characteristics) {
             analyzeByCharacList(characteristic, reviews)
                 .forEach(response -> {
+                    // 해당 Characteristic에 해당하는 Evaluation이 있는 지 확인 -> 있으면 로그 남기고 넘어감
+                    if(evaluationService.existsByReviewIdAndCharacteristicId(response.getReviewId(), characteristic.getId())) {
+                        log.info("이미 평가가 존재합니다. reviewId={}, characteristicId={}", response.getReviewId(), characteristic.getId());
+                        return;
+                    }
+
                     Review review = reviewById.get(response.getReviewId());
                     if (review == null) {
                         throw new IllegalStateException(
@@ -62,11 +70,6 @@ public class AnalyzerService {
 
         // 분석한 내용 저장
         evaluationService.saveAll(allEvaluations);
-
-        // review mark
-        for(Review review : reviews) {
-            review.markAsAggregated();
-        }
     }
 
     public List<AnalyzedResponse> analyzeByCharacList(Characteristic characteristic, List<Review> reviews) {

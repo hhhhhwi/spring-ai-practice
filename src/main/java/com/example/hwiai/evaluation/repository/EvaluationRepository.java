@@ -9,4 +9,5 @@ import com.example.hwiai.evaluation.Evaluation;
 public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     List<Evaluation> findByReviewProductId(Long productId);
 
+    boolean existsByReviewIdAndCharacteristicId(Long reviewId, Long characteristicId);
 }
