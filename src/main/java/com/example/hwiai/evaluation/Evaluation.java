@@ -1,5 +1,7 @@
 package com.example.hwiai.evaluation;
 
+import static com.example.hwiai.util.UniqueConstraints.UniqueConstraintNames.*;
+
 import com.example.hwiai.characteristic.Characteristic;
 import com.example.hwiai.entity.BaseEntity;
 import com.example.hwiai.review.Review;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(
-    name = "uk_evaluation_review_characteristic",
+    name = UK_EVALUATION_REVIEW_CHARACTERISTIC,
     columnNames = {"review_id", "characteristic_id"}
 ))
 public class Evaluation extends BaseEntity {
