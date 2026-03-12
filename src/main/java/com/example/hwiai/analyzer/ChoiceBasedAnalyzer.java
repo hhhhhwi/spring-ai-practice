@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
 import com.example.hwiai.analyzer.dto.AnalyzedResponse;
@@ -13,10 +12,9 @@ import com.example.hwiai.characteristic.CharacteristicOption;
 import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.characteristic.repository.CharacteristicOptionRepository;
 import com.example.hwiai.review.Review;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
-public class ChoiceBasedAnalyzer extends BaseAnalyzer {
+public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
     private static final String CHOICE_PROMPT_SUFFIX = """
 
             Allowed choice values:
@@ -28,12 +26,12 @@ public class ChoiceBasedAnalyzer extends BaseAnalyzer {
             3. scoreValue must always be 0.
             """;
 
+    private final AnalyzerExecutor analyzerExecutor;
     private final CharacteristicOptionRepository characteristicOptionRepository;
 
-    public ChoiceBasedAnalyzer(ChatClient.Builder chatClientBuilder,
-                               ObjectMapper objectMapper,
+    public ChoiceBasedAnalyzer(AnalyzerExecutor analyzerExecutor,
                                CharacteristicOptionRepository characteristicOptionRepository) {
-        super(chatClientBuilder, objectMapper);
+        this.analyzerExecutor = analyzerExecutor;
         this.characteristicOptionRepository = characteristicOptionRepository;
     }
 
@@ -46,7 +44,7 @@ public class ChoiceBasedAnalyzer extends BaseAnalyzer {
                     "No characteristic options found for characteristicId=" + characteristic.getId());
         }
 
-        return analyzeWithPrompt(
+        return analyzerExecutor.execute(
                 characteristic.getPrompt() + CHOICE_PROMPT_SUFFIX,
                 Map.of("options", convertOptionsToPromptValue(options)),
                 reviews,
