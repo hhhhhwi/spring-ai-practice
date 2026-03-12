@@ -1,6 +1,8 @@
 package com.example.hwiai.analyzer;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -26,6 +28,14 @@ public abstract class BaseAnalyzer implements CharacteristicAnalyzer {
 
     @Override
     public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
+        return analyzeWithPrompt(characteristic.getPrompt(), Map.of(), reviews, this::validate);
+    }
+
+    protected List<AnalyzedResponse> analyzeWithPrompt(
+            String prompt,
+            Map<String, String> promptParams,
+            List<Review> reviews,
+            Predicate<AnalyzedResponse> validator) {
         var outputConverter = new BeanOutputConverter<>(
                 new ParameterizedTypeReference<List<AnalyzedResponse>>() {
                 });
@@ -37,13 +47,16 @@ public abstract class BaseAnalyzer implements CharacteristicAnalyzer {
 
             return chatClient
                     .prompt()
-                    .user(u -> u.text(characteristic.getPrompt())
-                            .param("sentences", sentences)
-                            .param("format", outputConverter.getFormat()))
+                    .user(u -> {
+                        u.text(prompt);
+                        u.param("sentences", sentences);
+                        u.param("format", outputConverter.getFormat());
+                        promptParams.forEach(u::param);
+                    })
                     .call()
                     .entity(outputConverter)
                     .stream()
-                    .filter(x -> validate(x))
+                    .filter(validator)
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

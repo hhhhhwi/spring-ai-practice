@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.hwiai.analyzer.AnalyzerRegistry;
 import com.example.hwiai.analyzer.dto.AnalyzedResponse;
 import com.example.hwiai.characteristic.Characteristic;
+import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.characteristic.service.CharacteristicService;
 import com.example.hwiai.evaluation.Evaluation;
 import com.example.hwiai.evaluation.service.EvaluationService;
@@ -63,7 +64,7 @@ public class AnalyzerService {
                             "Analyzer returned unknown reviewId=" + response.getReviewId() + " for productId=" + productId
                         );
                     }
-                    Evaluation evaluation = new Evaluation(review, response.isRelated(), characteristic, response.getScoreValue(), response.getPhrase());
+                    Evaluation evaluation = createEvaluation(review, characteristic, response);
                     allEvaluations.add(evaluation);
                 });
         }
@@ -75,5 +76,23 @@ public class AnalyzerService {
     public List<AnalyzedResponse> analyzeByCharacList(Characteristic characteristic, List<Review> reviews) {
         return analyzerRegistry.getAnalyzer(characteristic.getValueType())
                 .analyze(characteristic, reviews);
+    }
+
+    private Evaluation createEvaluation(Review review, Characteristic characteristic, AnalyzedResponse response) {
+        if (characteristic.getValueType().equals(ValueType.CHOICE)) {
+            return new Evaluation(
+                    review,
+                    response.isRelated(),
+                    characteristic,
+                    response.getChoiceValue(),
+                    response.getPhrase());
+        }
+
+        return new Evaluation(
+                review,
+                response.isRelated(),
+                characteristic,
+                response.getScoreValue(),
+                response.getPhrase());
     }
 }
