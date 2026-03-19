@@ -28,4 +28,9 @@ public class CharacteristicOption extends BaseEntity {
     public boolean validate(String value) {
         return optionValue.equals(value);
     }
+
+    public CharacteristicOption(Characteristic characteristic, String optionValue) {
+        this.characteristic = characteristic;
+        this.optionValue = optionValue;
+    }
 }
