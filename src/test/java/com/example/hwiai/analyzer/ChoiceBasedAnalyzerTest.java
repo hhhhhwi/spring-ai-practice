@@ -3,6 +3,7 @@ package com.example.hwiai.analyzer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -31,6 +34,9 @@ public class ChoiceBasedAnalyzerTest {
 
     @Mock
     AnalyzerExecutor analyzerExecutor;
+
+    @Captor
+    ArgumentCaptor<Predicate<AnalyzedResponse>> validatorCaptor;
 
     private final Product product = new Product("product");
     private final Review review = new Review(product, "reviewText");
@@ -84,7 +90,7 @@ public class ChoiceBasedAnalyzerTest {
     }
 
     @Test
-    void analyze시_validation에_실패한_응답은_제외한다() {
+    void analyze시_전달한_validator는_validation에_실패한_응답을_false로_판단한다() {
         //given
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
         AnalyzedResponse validRelatedResponse = relatedResponse(0, option1.getOptionValue(), "reviewText");
@@ -94,24 +100,20 @@ public class ChoiceBasedAnalyzerTest {
         AnalyzedResponse invalidUnrelatedResponse = unrelatedResponse(0, option1.getOptionValue(), null);
 
         given(characteristicOptionRepository.findByCharacteristicId(characteristic.getId())).willReturn(options);
-        given(analyzerExecutor.execute(any(), any(), any(), any())).willAnswer(invocation -> {
-            Predicate<AnalyzedResponse> validator = invocation.getArgument(3);
-            return List.of(
-                    validRelatedResponse,
-                    invalidChoiceResponse,
-                    invalidPhraseResponse,
-                    validUnrelatedResponse,
-                    invalidUnrelatedResponse)
-                    .stream()
-                    .filter(validator)
-                    .toList();
-        });
+        given(analyzerExecutor.execute(any(), any(), any(), any())).willReturn(List.of());
 
         //when
-        List<AnalyzedResponse> responses = choiceBasedAnalyzer.analyze(characteristic, List.of(review));
+        choiceBasedAnalyzer.analyze(characteristic, List.of(review));
 
         //then
-        assertThat(responses).containsExactly(validRelatedResponse, validUnrelatedResponse);
+        verify(analyzerExecutor).execute(any(), any(), any(), validatorCaptor.capture());
+        Predicate<AnalyzedResponse> validator = validatorCaptor.getValue();
+
+        assertThat(validator.test(validRelatedResponse)).isTrue();
+        assertThat(validator.test(invalidChoiceResponse)).isFalse();
+        assertThat(validator.test(invalidPhraseResponse)).isFalse();
+        assertThat(validator.test(validUnrelatedResponse)).isTrue();
+        assertThat(validator.test(invalidUnrelatedResponse)).isFalse();
     }
 
     private Characteristic createCharacteristic(Long id) {
