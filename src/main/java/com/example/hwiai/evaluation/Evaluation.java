@@ -71,7 +71,7 @@ public class Evaluation extends BaseEntity {
         this.review = review;
         this.isRelated = isRelated;
         this.characteristic = characteristic;
-        this.stringValue = null;
+        this.stringValue = stringValue;
         this.phrase = phrase;
     }
 }
