@@ -36,4 +36,8 @@ public class EvaluationService {
             throw ex;
         }
     }
+    
+    public List<Evaluation> findByReviewProductIdAndCharacteristicIdAndIsRelatedTrue(Long productId, Long characteristicId) {
+        return evaluationRepository.findByReviewProductIdAndCharacteristicIdAndIsRelatedTrue(productId, characteristicId);
+    }
 }

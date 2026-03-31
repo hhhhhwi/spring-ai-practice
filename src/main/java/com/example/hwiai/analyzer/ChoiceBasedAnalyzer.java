@@ -17,13 +17,11 @@ import com.example.hwiai.review.Review;
 public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
     private static final String CHOICE_PROMPT_SUFFIX = """
 
-            Allowed choice values:
-            {options}
-
-            Additional rules:
-            1. If isRelated is true, choiceValue must be exactly one of the allowed choice values.
-            2. If isRelated is false, choiceValue must be null.
-            3. scoreValue must always be 0.
+            CRITICAL VALIDATION RULE:
+            1. If isRelated is true, choiceValue must be exactly one of the exact strings ( {options} ) and phrase MUST be a non-empty string.
+            2. If isRelated is false, then value MUST be null and phrase MUST be null.
+            3. Never return null for value or phrase when isRelated is true.
+            4. scoreValue must always be 0.
             """;
 
     private final AnalyzerExecutor analyzerExecutor;

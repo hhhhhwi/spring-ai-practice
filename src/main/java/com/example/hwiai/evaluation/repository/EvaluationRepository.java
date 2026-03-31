@@ -10,4 +10,6 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     List<Evaluation> findByReviewProductId(Long productId);
 
     boolean existsByReviewIdAndCharacteristicId(Long reviewId, Long characteristicId);
+
+    List<Evaluation> findByReviewProductIdAndCharacteristicIdAndIsRelatedTrue(Long productId, Long characteristicId);
 }
