@@ -23,4 +23,17 @@ public class AggregationService {
                 .orElse(0.0)
             );
     }
+
+    public String aggregateChoices(Long productId, Long characteristicId) {
+        return evaluationService
+                .findByReviewProductIdAndCharacteristicIdAndIsRelatedTrue(productId, characteristicId)
+                .stream()
+                .map(Evaluation::getStringValue)
+                .collect(Collectors.groupingBy(value -> value, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("");
+    }
 }
