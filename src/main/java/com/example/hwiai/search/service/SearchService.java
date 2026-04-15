@@ -33,55 +33,57 @@ public class SearchService {
         return characteristicService.findByIsActiveTrue();
     }
 
-    public List<SearchResponse> search(List<SearchRequest> filters) {
-        // 빈 필터: 전체 상품 반환
+    public List<SearchResponse> search(List<SearchRequest> requests) {
         List<Product> allProducts = productRepository.findAll();
         
-        return allProducts.stream()
+        // 빈 필터: 전체 상품 반환 (최적화 불필요)
+        if (requests == null || requests.isEmpty()) {
+            return allProducts.stream()
+                .map(product -> {
+                    List<AggregationResponse> aggregations = aggregationService.aggregateAll(product.getId());
+                    return new SearchResponse(product.getId(), product.getName(), aggregations);
+                })
+                .collect(Collectors.toList());
+        }
+        
+        // 필터가 있는 경우: 필터 조건의 특성만 먼저 집계하여 상품 필터링
+        List<Product> filteredProducts = allProducts.stream()
+            .filter(product -> matchesAllFiltersOptimized(product.getId(), requests))
+            .collect(Collectors.toList());
+        
+        // 통과한 상품만 전체 특성 집계
+        // TODO: 최적화 - 필터링 단계에서 집계한 결과를 재사용하여 중복 집계 방지
+        //       현재는 필터 특성을 다시 집계하고 있음 (필터 특성 수가 많을 때 비효율적)
+        return filteredProducts.stream()
             .map(product -> {
                 List<AggregationResponse> aggregations = aggregationService.aggregateAll(product.getId());
                 return new SearchResponse(product.getId(), product.getName(), aggregations);
             })
-            .filter(result -> matchesAllFilters(result, filters))
             .collect(Collectors.toList());
     }
 
-    private boolean matchesAllFilters(SearchResponse result, List<SearchRequest> filters) {
-        // 빈 필터면 모든 상품 통과
-        if (filters == null || filters.isEmpty()) {
-            return true;
-        }
-
-        // 다중 필터 AND 결합: 모든 필터를 만족해야 함
-        return filters.stream().allMatch(filter -> matchesFilter(result, filter));
+    private boolean matchesAllFiltersOptimized(Long productId, List<SearchRequest> requests) {
+        // 모든 필터 조건을 만족해야 함 (AND 결합)
+        return requests.stream().allMatch(request -> matchesFilterOptimized(productId, request));
     }
 
-    private boolean matchesFilter(SearchResponse result, SearchRequest filter) {
-        // 해당 특성의 집계 결과 찾기
-        AggregationResponse aggregation = result.getCharacteristics().stream()
-            .filter(agg -> agg.getCharacteristicId().equals(filter.getCharacteristicId()))
-            .findFirst()
-            .orElse(null);
-
-        // 집계 결과가 없으면 필터 조건 불만족
-        if (aggregation == null) {
-            return false;
-        }
-
+    private boolean matchesFilterOptimized(Long productId, SearchRequest request) {
         // SCORE 필터: N점 이상
-        if (filter.getValueType() == ValueType.SCORE) {
-            if (filter.getMinScore() == null) {
+        if (request.getValueType() == ValueType.SCORE) {
+            if (request.getMinScore() == null) {
                 return false;
             }
-            return aggregation.getScoreValue() >= filter.getMinScore();
+            int scoreValue = aggregationService.aggregateScores(productId, request.getCharacteristicId());
+            return scoreValue >= request.getMinScore();
         }
 
         // CHOICE 필터: 최빈값 일치
-        if (filter.getValueType() == ValueType.CHOICE) {
-            if (filter.getChoiceValue() == null) {
+        if (request.getValueType() == ValueType.CHOICE) {
+            if (request.getChoiceValue() == null) {
                 return false;
             }
-            return filter.getChoiceValue().equals(aggregation.getStringValue());
+            String choiceValue = aggregationService.aggregateChoices(productId, request.getCharacteristicId());
+            return request.getChoiceValue().equals(choiceValue);
         }
 
         return false;

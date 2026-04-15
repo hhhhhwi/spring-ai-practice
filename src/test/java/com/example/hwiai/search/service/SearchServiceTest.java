@@ -86,67 +86,71 @@ class SearchServiceTest {
     void 점수_검색조건으로_검색_시_조건에_맞는_제품을_반환한다() {
         // Given
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
-        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
-        when(aggregationService.aggregateAll(product2.getId())).thenReturn(aggregations2);
+        when(aggregationService.aggregateScores(product1.getId(), 1L)).thenReturn(4);
+        when(aggregationService.aggregateScores(product2.getId(), 1L)).thenReturn(3);
 
-        SearchRequest filter = new SearchRequest(1L, ValueType.SCORE, 4.0, null);
+        SearchRequest request = new SearchRequest(1L, ValueType.SCORE, 4.0, null);
 
         // When
-        List<SearchResponse> results = searchService.search(Arrays.asList(filter));
+        List<SearchResponse> responses = searchService.search(Arrays.asList(request));
 
         // Then
-        assertEquals(1, results.size());
-        assertEquals(product1.getName(), results.get(0).getProductName());
+        assertEquals(1, responses.size());
+        assertEquals(product1.getName(), responses.get(0).getProductName());
     }
 
     @Test
     void 선택_검색조건으로_검색_시_조건에_맞는_제품을_반환한다() {
         // Given
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
-        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
-        when(aggregationService.aggregateAll(product2.getId())).thenReturn(aggregations2);
+        when(aggregationService.aggregateChoices(product1.getId(), 2L)).thenReturn("A");
+        when(aggregationService.aggregateChoices(product2.getId(), 2L)).thenReturn("B");
 
-        SearchRequest filter = new SearchRequest(2L, ValueType.CHOICE, null, "A");
+        SearchRequest request = new SearchRequest(2L, ValueType.CHOICE, null, "A");
 
         // When
-        List<SearchResponse> results = searchService.search(Arrays.asList(filter));
+        List<SearchResponse> responses = searchService.search(Arrays.asList(request));
 
         // Then
-        assertEquals(1, results.size());
-        assertEquals(product1.getName(), results.get(0).getProductName());
+        assertEquals(1, responses.size());
+        assertEquals(product1.getName(), responses.get(0).getProductName());
     }
 
     @Test
     void 복합_검색조건으로_검색_시_조건에_맞는_제품을_반환한다() {
         // Given
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
-        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
-        when(aggregationService.aggregateAll(product2.getId())).thenReturn(aggregations2);
+        // 필터링 단계: 각 상품의 필터 조건 특성만 집계
+        // product1: score=4 (통과), choice=A (통과) → 최종 통과
+        when(aggregationService.aggregateScores(product1.getId(), 1L)).thenReturn(4);
+        when(aggregationService.aggregateChoices(product1.getId(), 2L)).thenReturn("A");
+        // product2: score=3 (실패) → choice 검사 전에 필터링됨
+        when(aggregationService.aggregateScores(product2.getId(), 1L)).thenReturn(3);
 
-        SearchRequest scoreFilter = new SearchRequest(1L, ValueType.SCORE, 4.0, null);
-        SearchRequest choiceFilter = new SearchRequest(2L, ValueType.CHOICE, null, "A");
+        SearchRequest scoreRequest = new SearchRequest(1L, ValueType.SCORE, 4.0, null);
+        SearchRequest choiceRequest = new SearchRequest(2L, ValueType.CHOICE, null, "A");
 
         // When
-        List<SearchResponse> results = searchService.search(Arrays.asList(scoreFilter, choiceFilter));
+        List<SearchResponse> responses = searchService.search(Arrays.asList(scoreRequest, choiceRequest));
 
         // Then
-        assertEquals(1, results.size());
-        assertEquals(product1.getName(), results.get(0).getProductName());
+        assertEquals(1, responses.size());
+        assertEquals(product1.getName(), responses.get(0).getProductName());
     }
 
     @Test
     void 검색조건에_맞는_제품이_없으면_빈_리스트를_반환한다() {
         // Given
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
-        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
-        when(aggregationService.aggregateAll(product2.getId())).thenReturn(aggregations2);
+        when(aggregationService.aggregateScores(product1.getId(), 1L)).thenReturn(4);
+        when(aggregationService.aggregateScores(product2.getId(), 1L)).thenReturn(3);
 
-        SearchRequest filter = new SearchRequest(1L, ValueType.SCORE, 5.0, null);
+        SearchRequest request = new SearchRequest(1L, ValueType.SCORE, 5.0, null);
 
         // When
-        List<SearchResponse> results = searchService.search(Arrays.asList(filter));
+        List<SearchResponse> responses = searchService.search(Arrays.asList(request));
 
         // Then
-        assertEquals(0, results.size());
+        assertEquals(0, responses.size());
     }
 }
