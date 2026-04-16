@@ -53,7 +53,7 @@ public class AggregationService {
         return characteritics.stream().map(charac -> {
             String choice = aggregateChoices(productId, charac.getId());
             int score = aggregateScores(productId, charac.getId());
-            return new AggregationResponse(charac.getId(), charac.getName(), score, choice);
+            return AggregationResponse.of(charac.getId(), charac.getName(), score, choice);
         }).collect(Collectors.toList());
     }
 }

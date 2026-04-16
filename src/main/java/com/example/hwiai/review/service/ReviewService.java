@@ -10,6 +10,7 @@ import com.example.hwiai.product.Product;
 import com.example.hwiai.product.repository.ProductRepository;
 import com.example.hwiai.review.Review;
 import com.example.hwiai.review.dto.ReviewRequest;
+import com.example.hwiai.review.dto.ReviewResponse;
 import com.example.hwiai.review.repository.ReviewRepository;
 
 @Service
@@ -27,6 +28,16 @@ public class ReviewService {
 
     public List<Review> findByProductIdAndTextIsNotNull(Long productId) {
         List<Review> reviews = reviewRepository.findByProductIdAndTextIsNotNull(productId);
+
+        if (reviews.size() == 0) {
+            throw new RuntimeException("No reviews with text found for product ID: " + productId);
+        }
+
+        return reviews;
+    }
+
+    public List<Review> findByProductId(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductId(productId);
 
         if (reviews.size() == 0) {
             throw new RuntimeException("No reviews with text found for product ID: " + productId);
