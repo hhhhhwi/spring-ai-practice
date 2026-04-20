@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.example.hwiai.aggregation.dto.AggregationResponse;
+import com.example.hwiai.aggregation.Aggregation;
 import com.example.hwiai.aggregation.service.AggregationService;
 import com.example.hwiai.characteristic.Characteristic;
 import com.example.hwiai.characteristic.ValueType;
@@ -40,8 +40,8 @@ public class SearchService {
         if (requests == null || requests.isEmpty()) {
             return allProducts.stream()
                 .map(product -> {
-                    List<AggregationResponse> aggregations = aggregationService.aggregateAll(product.getId());
-                    return new SearchResponse(product.getId(), product.getName(), aggregations);
+                    List<Aggregation> aggregations = aggregationService.aggregateAll(product.getId());
+                    return SearchResponse.of(product, aggregations);
                 })
                 .collect(Collectors.toList());
         }
@@ -56,8 +56,8 @@ public class SearchService {
         //       현재는 필터 특성을 다시 집계하고 있음 (필터 특성 수가 많을 때 비효율적)
         return filteredProducts.stream()
             .map(product -> {
-                List<AggregationResponse> aggregations = aggregationService.aggregateAll(product.getId());
-                return new SearchResponse(product.getId(), product.getName(), aggregations);
+                List<Aggregation> aggregations = aggregationService.aggregateAll(product.getId());
+                return SearchResponse.of(product, aggregations);
             })
             .collect(Collectors.toList());
     }

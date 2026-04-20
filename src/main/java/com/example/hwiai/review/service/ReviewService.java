@@ -35,6 +35,10 @@ public class ReviewService {
         return reviews;
     }
 
+    public List<Review> findByProductId(Long productId) {
+        return reviewRepository.findByProductId(productId);
+    }
+
     public void saveReview(ReviewRequest request) {
         Long productId = request.getProductId();
         int scoreValue = request.getScoreValue();

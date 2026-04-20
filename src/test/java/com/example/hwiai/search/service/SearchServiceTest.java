@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.example.hwiai.aggregation.dto.AggregationResponse;
+import com.example.hwiai.aggregation.Aggregation;
 import com.example.hwiai.aggregation.service.AggregationService;
 import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.product.Product;
@@ -36,8 +36,8 @@ class SearchServiceTest {
 
     private Product product1;
     private Product product2;
-    private List<AggregationResponse> aggregations1;
-    private List<AggregationResponse> aggregations2;
+    private List<Aggregation> aggregations1;
+    private List<Aggregation> aggregations2;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -50,14 +50,14 @@ class SearchServiceTest {
 
         // Product 1: 특성 1은 점수 4, 특성 2는 선택값 "A"
         aggregations1 = Arrays.asList(
-            new AggregationResponse(1L, "Characteristic 1", 4, ""),
-            new AggregationResponse(2L, "Characteristic 2", 0, "A")
+            Aggregation.score(1L, "Characteristic 1", 4),
+            Aggregation.choice(2L, "Characteristic 2", "A")
         );
 
         // Product 2: 특성 1은 점수 3, 특성 2는 선택값 "B"
         aggregations2 = Arrays.asList(
-            new AggregationResponse(1L, "Characteristic 1", 3, ""),
-            new AggregationResponse(2L, "Characteristic 2", 0, "B")
+            Aggregation.score(1L, "Characteristic 1", 3),
+            Aggregation.choice(2L, "Characteristic 2", "B")
         );
     }
     
@@ -88,6 +88,7 @@ class SearchServiceTest {
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
         when(aggregationService.aggregateScores(product1.getId(), 1L)).thenReturn(4);
         when(aggregationService.aggregateScores(product2.getId(), 1L)).thenReturn(3);
+        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
 
         SearchRequest request = new SearchRequest(1L, ValueType.SCORE, 4.0, null);
 
@@ -105,6 +106,7 @@ class SearchServiceTest {
         when(productRepository.findAll()).thenReturn(Arrays.asList(product1, product2));
         when(aggregationService.aggregateChoices(product1.getId(), 2L)).thenReturn("A");
         when(aggregationService.aggregateChoices(product2.getId(), 2L)).thenReturn("B");
+        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
 
         SearchRequest request = new SearchRequest(2L, ValueType.CHOICE, null, "A");
 
@@ -124,6 +126,7 @@ class SearchServiceTest {
         // product1: score=4 (통과), choice=A (통과) → 최종 통과
         when(aggregationService.aggregateScores(product1.getId(), 1L)).thenReturn(4);
         when(aggregationService.aggregateChoices(product1.getId(), 2L)).thenReturn("A");
+        when(aggregationService.aggregateAll(product1.getId())).thenReturn(aggregations1);
         // product2: score=3 (실패) → choice 검사 전에 필터링됨
         when(aggregationService.aggregateScores(product2.getId(), 1L)).thenReturn(3);
 
