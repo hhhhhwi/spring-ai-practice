@@ -50,14 +50,14 @@ class SearchServiceTest {
 
         // Product 1: 특성 1은 점수 4, 특성 2는 선택값 "A"
         aggregations1 = Arrays.asList(
-            new AggregationResponse(1L, "Characteristic 1", 4, ""),
-            new AggregationResponse(2L, "Characteristic 2", 0, "A")
+            AggregationResponse.of(1L, "Characteristic 1", 4, ""),
+            AggregationResponse.of(2L, "Characteristic 2", 0, "A")
         );
 
         // Product 2: 특성 1은 점수 3, 특성 2는 선택값 "B"
         aggregations2 = Arrays.asList(
-            new AggregationResponse(1L, "Characteristic 1", 3, ""),
-            new AggregationResponse(2L, "Characteristic 2", 0, "B")
+            AggregationResponse.of(1L, "Characteristic 1", 3, ""),
+            AggregationResponse.of(2L, "Characteristic 2", 0, "B")
         );
     }
     
