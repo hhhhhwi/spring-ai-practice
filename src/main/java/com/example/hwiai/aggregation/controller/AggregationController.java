@@ -1,6 +1,7 @@
 package com.example.hwiai.aggregation.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,10 @@ public class AggregationController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<List<AggregationResponse>> getAggreations(@PathVariable Long productId) {
-        return ResponseEntity.ok().body(aggregationService.aggregateAll(productId));
+        List<AggregationResponse> responses = aggregationService.aggregateAll(productId).stream()
+            .map(AggregationResponse::of)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(responses);
     }   
 }
