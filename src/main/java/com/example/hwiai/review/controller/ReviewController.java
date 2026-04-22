@@ -8,10 +8,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.hwiai.review.dto.ReviewRequest;
 import com.example.hwiai.review.dto.ReviewResponse;
 import com.example.hwiai.review.service.ReviewService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
 
 @AllArgsConstructor
 @RestController
@@ -28,4 +33,15 @@ public class ReviewController {
 
         return ResponseEntity.ok().body(reviewResponses);
     }
+
+    @PostMapping
+    public ResponseEntity<ReviewResponse> saveReview(ReviewRequest request) {
+        return ResponseEntity.ok().body(ReviewResponse.of(reviewService.saveReview(request)));
+    }
+
+    @GetMapping("/detail/{reviewId}")
+    public ResponseEntity<ReviewResponse> getMethodName(@RequestParam Long reviewId) {
+        return ResponseEntity.ok().body(ReviewResponse.of(reviewService.findById(reviewId)));
+    }
+      
 }
