@@ -1,5 +1,6 @@
 package com.example.hwiai.review.controller;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -12,9 +13,9 @@ import com.example.hwiai.review.dto.ReviewRequest;
 import com.example.hwiai.review.dto.ReviewResponse;
 import com.example.hwiai.review.service.ReviewService;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -35,12 +36,13 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<ReviewResponse> saveReview(ReviewRequest request) {
-        return ResponseEntity.ok().body(ReviewResponse.of(reviewService.saveReview(request)));
+    public ResponseEntity<ReviewResponse> saveReview(@RequestBody ReviewRequest request) {
+        Long reviewId = reviewService.saveReview(request).getId();
+        return ResponseEntity.created(URI.create("/reviews/detail/" + reviewId)).build();
     }
 
     @GetMapping("/detail/{reviewId}")
-    public ResponseEntity<ReviewResponse> getMethodName(@RequestParam Long reviewId) {
+    public ResponseEntity<ReviewResponse> getReview(@PathVariable Long reviewId) {
         return ResponseEntity.ok().body(ReviewResponse.of(reviewService.findById(reviewId)));
     }
       

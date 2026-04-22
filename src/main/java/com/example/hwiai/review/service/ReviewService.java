@@ -46,6 +46,6 @@ public class ReviewService {
 
     public Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId)
-        .orElseThrow(() -> new RuntimeException("Product not found with ID: " + reviewId)); // TODO customeException 생성
+        .orElseThrow(() -> new RuntimeException("Review not found with ID: " + reviewId)); // TODO customeException 생성
     }
 }
