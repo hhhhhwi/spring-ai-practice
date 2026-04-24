@@ -69,6 +69,7 @@ public class SearchService {
 
     private boolean matchesFilterOptimized(Long productId, SearchRequest request) {
         // SCORE 필터: N점 이상
+        // TODO SearchService가 aggregateScores / aggregateChoices를 직접 고르지 않게 하는 것이 좋을까?
         if (request.getValueType() == ValueType.SCORE) {
             if (request.getMinScore() == null) {
                 return false;

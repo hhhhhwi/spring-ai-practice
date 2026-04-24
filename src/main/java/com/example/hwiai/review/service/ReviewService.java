@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.hwiai.error.exception.ProductNotFoundException;
+import com.example.hwiai.error.exception.ReviewNotFoundException;
 import com.example.hwiai.product.Product;
 import com.example.hwiai.product.repository.ProductRepository;
 import com.example.hwiai.review.Review;
@@ -38,7 +40,7 @@ public class ReviewService {
         Long productId = request.getProductId();
         
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         Review review = new Review(product, request.getText());
         return reviewRepository.save(review);
@@ -46,6 +48,6 @@ public class ReviewService {
 
     public Review findById(Long reviewId) {
         return reviewRepository.findById(reviewId)
-        .orElseThrow(() -> new RuntimeException("Review not found with ID: " + reviewId)); // TODO customeException 생성
+        .orElseThrow(() -> new ReviewNotFoundException(reviewId)); 
     }
 }

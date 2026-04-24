@@ -13,9 +13,9 @@ import com.example.hwiai.review.dto.ReviewRequest;
 import com.example.hwiai.review.dto.ReviewResponse;
 import com.example.hwiai.review.service.ReviewService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 
