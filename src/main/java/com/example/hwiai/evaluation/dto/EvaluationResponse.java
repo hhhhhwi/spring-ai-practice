@@ -1,34 +1,41 @@
 package com.example.hwiai.evaluation.dto;
 
+import com.example.hwiai.characteristic.ValueType;
+import com.example.hwiai.evaluation.Evaluation;
+
+import lombok.Getter;
+
+@Getter
 public class EvaluationResponse {
-    private Long reviewId;
-
+    private Long characteristicId;
+    private String characteristicName;
+    private ValueType valueType;
     private boolean isRelated;
-
-    private int value;
-
+    private int scoreValue;
+    private String stringValue;
     private String phrase;
 
-    public EvaluationResponse(Long reviewId, boolean isRelated, int value, String phrase) {
-        this.reviewId = reviewId;
+    public static EvaluationResponse of(Evaluation evaluation) {
+        return new EvaluationResponse(
+            evaluation.getCharacteristic().getId(),
+            evaluation.getCharacteristic().getName(),
+            evaluation.getCharacteristic().getValueType(),
+            evaluation.isRelated(),
+            evaluation.getScoreValue(),
+            evaluation.getStringValue(),
+            evaluation.getPhrase()
+        );
+    }
+
+    private EvaluationResponse(Long characteristicId, String characteristicName,
+                               ValueType valueType, boolean isRelated,
+                               int scoreValue, String stringValue, String phrase) {
+        this.characteristicId = characteristicId;
+        this.characteristicName = characteristicName;
+        this.valueType = valueType;
         this.isRelated = isRelated;
-        this.value = value;
+        this.scoreValue = scoreValue;
+        this.stringValue = stringValue;
         this.phrase = phrase;
-    }
-
-    public Long getReviewId() {
-        return reviewId;
-    }
-
-    public boolean isRelated() {
-        return isRelated;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public String getPhrase() {
-        return phrase;
     }
 }
