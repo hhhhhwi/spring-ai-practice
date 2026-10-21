@@ -38,4 +38,13 @@ public class AnalyzedResponse {
     public String getPhrase() {
         return phrase;
     }
+
+    @Override
+    public String toString() {
+        return "AnalyzedResponse[reviewId=" + reviewId
+                + ", isRelated=" + isRelated
+                + ", scoreValue=" + scoreValue
+                + ", choiceValue=" + choiceValue
+                + ", phrase=" + phrase + "]";
+    }
 }

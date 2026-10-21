@@ -2,6 +2,7 @@ package com.example.hwiai.analyzer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.hwiai.analyzer.dto.AnalyzedResponse;
 import com.example.hwiai.review.Review;
+import com.example.hwiai.error.exception.UnexpectedAnalyzerResponseException;
 import com.example.hwiai.util.AnalyzeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +29,7 @@ public class AnalyzerExecutor {
     }
 
     public List<AnalyzedResponse> execute(
+            Long characteristicId,
             String prompt,
             Map<String, String> promptParams,
             List<Review> reviews,
@@ -36,6 +39,9 @@ public class AnalyzerExecutor {
                 });
 
         try {
+            Set<Long> requestedReviewIds = reviews.stream()
+                    .map(Review::getId)
+                    .collect(Collectors.toSet());
             String sentences = objectMapper
                     .writerWithView(AnalyzeValue.class)
                     .writeValueAsString(reviews);
@@ -51,7 +57,17 @@ public class AnalyzerExecutor {
                     .call()
                     .entity(outputConverter)
                     .stream()
-                    .filter(validator)
+                    .filter(response -> {
+                        if (response.getReviewId() == null || !requestedReviewIds.contains(response.getReviewId())) {
+                            throw new UnexpectedAnalyzerResponseException(response.getReviewId(), characteristicId);
+                        }
+                        boolean isValid = validator.test(response);
+                        if (!isValid) {
+                            org.slf4j.LoggerFactory.getLogger(AnalyzerExecutor.class)
+                                    .warn("Invalid analyzer response excluded from persistence: {}", response);
+                        }
+                        return isValid;
+                    })
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

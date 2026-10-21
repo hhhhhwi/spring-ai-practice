@@ -21,6 +21,7 @@ public class ScoreBasedAnalyzer implements CharacteristicAnalyzer {
     @Override
     public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
         return analyzerExecutor.execute(
+                characteristic.getId(),
                 characteristic.getPrompt(),
                 Map.of(),
                 reviews,
@@ -30,9 +31,12 @@ public class ScoreBasedAnalyzer implements CharacteristicAnalyzer {
     @Override
     public boolean validate(AnalyzedResponse response) {
         if (response.isRelated()) {
-            return response.getScoreValue() > 0;
+            return response.getScoreValue() >= 1
+                    && response.getScoreValue() <= 5
+                    && response.getPhrase() != null
+                    && !response.getPhrase().isBlank();
         }
-        return response.getScoreValue() == 0;
+        return response.getScoreValue() == 0 && response.getPhrase() == null;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class ChoiceBasedAnalyzerTest {
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
         AnalyzedResponse analyzedResponse = new AnalyzedResponse(1L, true, 0, option1.getOptionValue(), "reviewText");
         given(characteristicOptionRepository.findByCharacteristicId(characteristic.getId())).willReturn(List.of(option1, option2));
-        given(analyzerExecutor.execute(any(), any(), any(), any())).willReturn(List.of(analyzedResponse));
+        given(analyzerExecutor.execute(any(), any(), any(), any(), any())).willReturn(List.of(analyzedResponse));
 
         //when
         List<AnalyzedResponse> responses = choiceBasedAnalyzer.analyze(characteristic, List.of(review));
@@ -100,13 +100,13 @@ public class ChoiceBasedAnalyzerTest {
         AnalyzedResponse invalidUnrelatedResponse = unrelatedResponse(0, option1.getOptionValue(), null);
 
         given(characteristicOptionRepository.findByCharacteristicId(characteristic.getId())).willReturn(options);
-        given(analyzerExecutor.execute(any(), any(), any(), any())).willReturn(List.of());
+        given(analyzerExecutor.execute(any(), any(), any(), any(), any())).willReturn(List.of());
 
         //when
         choiceBasedAnalyzer.analyze(characteristic, List.of(review));
 
         //then
-        verify(analyzerExecutor).execute(any(), any(), any(), validatorCaptor.capture());
+        verify(analyzerExecutor).execute(any(), any(), any(), any(), validatorCaptor.capture());
         Predicate<AnalyzedResponse> validator = validatorCaptor.getValue();
 
         assertThat(validator.test(validRelatedResponse)).isTrue();

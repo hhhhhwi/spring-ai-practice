@@ -11,6 +11,7 @@ import com.example.hwiai.characteristic.Characteristic;
 import com.example.hwiai.characteristic.CharacteristicOption;
 import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.characteristic.repository.CharacteristicOptionRepository;
+import com.example.hwiai.error.exception.AnalysisConfigurationException;
 import com.example.hwiai.review.Review;
 
 @Component
@@ -37,12 +38,13 @@ public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
     public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
         List<CharacteristicOption> options = characteristicOptionRepository.findByCharacteristicId(characteristic.getId());
 
-        if (options.size() == 0) {
-            throw new IllegalStateException(
+        if (options.isEmpty()) {
+            throw new AnalysisConfigurationException(
                     "No characteristic options found for characteristicId=" + characteristic.getId());
         }
 
         return analyzerExecutor.execute(
+                characteristic.getId(),
                 characteristic.getPrompt() + CHOICE_PROMPT_SUFFIX,
                 Map.of("options", convertOptionsToPromptValue(options)),
                 reviews,
