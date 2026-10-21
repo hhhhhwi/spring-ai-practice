@@ -29,4 +29,11 @@ public class Characteristic extends BaseEntity {
     private ValueType valueType;
 
     private boolean isActive;
+
+    public Characteristic(String name, String prompt, ValueType valueType, boolean isActive) {
+        this.name = name;
+        this.prompt = prompt;
+        this.valueType = valueType;
+        this.isActive = isActive;
+    }
 }
