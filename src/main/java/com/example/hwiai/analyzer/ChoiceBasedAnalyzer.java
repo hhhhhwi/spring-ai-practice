@@ -11,6 +11,7 @@ import com.example.hwiai.characteristic.Characteristic;
 import com.example.hwiai.characteristic.CharacteristicOption;
 import com.example.hwiai.characteristic.ValueType;
 import com.example.hwiai.characteristic.repository.CharacteristicOptionRepository;
+import com.example.hwiai.error.exception.AnalysisConfigurationException;
 import com.example.hwiai.review.Review;
 
 @Component
@@ -19,9 +20,8 @@ public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
 
             CRITICAL VALIDATION RULE:
             1. If isRelated is true, choiceValue must be exactly one of the exact strings ( {options} ) and phrase MUST be a non-empty string.
-            2. If isRelated is false, then value MUST be null and phrase MUST be null.
-            3. Never return null for value or phrase when isRelated is true.
-            4. scoreValue must always be 0.
+            2. If isRelated is false, then choiceValue MUST be null and phrase MUST be null.
+            3. Never return null for choiceValue or phrase when isRelated is true.
             """;
 
     private final AnalyzerExecutor analyzerExecutor;
@@ -37,12 +37,13 @@ public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
     public List<AnalyzedResponse> analyze(Characteristic characteristic, List<Review> reviews) {
         List<CharacteristicOption> options = characteristicOptionRepository.findByCharacteristicId(characteristic.getId());
 
-        if (options.size() == 0) {
-            throw new IllegalStateException(
+        if (options.isEmpty()) {
+            throw new AnalysisConfigurationException(
                     "No characteristic options found for characteristicId=" + characteristic.getId());
         }
 
         return analyzerExecutor.execute(
+                characteristic.getId(),
                 characteristic.getPrompt() + CHOICE_PROMPT_SUFFIX,
                 Map.of("options", convertOptionsToPromptValue(options)),
                 reviews,
@@ -52,15 +53,13 @@ public class ChoiceBasedAnalyzer implements CharacteristicAnalyzer {
     @Override
     public boolean validate(AnalyzedResponse response) {
         if (response.isRelated()) {
-            return response.getScoreValue() == 0
-                    && response.getChoiceValue() != null
+            return response.getChoiceValue() != null
                     && !response.getChoiceValue().isBlank()
                     && response.getPhrase() != null
                     && !response.getPhrase().isBlank();
         }
 
-        return response.getScoreValue() == 0
-                && response.getChoiceValue() == null
+        return response.getChoiceValue() == null
                 && response.getPhrase() == null;
     }
 

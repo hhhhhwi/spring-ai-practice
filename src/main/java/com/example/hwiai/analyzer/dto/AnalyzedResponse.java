@@ -5,13 +5,13 @@ public class AnalyzedResponse {
 
     private boolean isRelated;
 
-    private int scoreValue;
+    private Integer scoreValue;
 
     private String choiceValue;
 
     private String phrase;
 
-    public AnalyzedResponse(Long reviewId, boolean isRelated, int scoreValue, String choiceValue, String phrase) {
+    public AnalyzedResponse(Long reviewId, boolean isRelated, Integer scoreValue, String choiceValue, String phrase) {
         this.reviewId = reviewId;
         this.isRelated = isRelated;
         this.scoreValue = scoreValue;
@@ -27,7 +27,7 @@ public class AnalyzedResponse {
         return isRelated;
     }
 
-    public int getScoreValue() {
+    public Integer getScoreValue() {
         return scoreValue;
     }
 
@@ -37,5 +37,14 @@ public class AnalyzedResponse {
 
     public String getPhrase() {
         return phrase;
+    }
+
+    @Override
+    public String toString() {
+        return "AnalyzedResponse[reviewId=" + reviewId
+                + ", isRelated=" + isRelated
+                + ", scoreValue=" + scoreValue
+                + ", choiceValue=" + choiceValue
+                + ", phrase=" + phrase + "]";
     }
 }

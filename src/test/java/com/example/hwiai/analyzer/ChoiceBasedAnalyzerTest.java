@@ -51,7 +51,7 @@ public class ChoiceBasedAnalyzerTest {
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
         AnalyzedResponse analyzedResponse = new AnalyzedResponse(1L, true, 0, option1.getOptionValue(), "reviewText");
         given(characteristicOptionRepository.findByCharacteristicId(characteristic.getId())).willReturn(List.of(option1, option2));
-        given(analyzerExecutor.execute(any(), any(), any(), any())).willReturn(List.of(analyzedResponse));
+        given(analyzerExecutor.execute(any(), any(), any(), any(), any())).willReturn(List.of(analyzedResponse));
 
         //when
         List<AnalyzedResponse> responses = choiceBasedAnalyzer.analyze(characteristic, List.of(review));
@@ -64,13 +64,14 @@ public class ChoiceBasedAnalyzerTest {
     }
 
     @Test
-    void validate시_isRelated가_true면_score는_0이고_choice와_phrase는_비어있지_않아야_한다() {
+    void validate시_isRelated가_true면_choice와_phrase는_비어있지_않아야_한다() {
         //given
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
 
         //then
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, option1.getOptionValue(), "reviewText"))).isTrue();
-        assertThat(choiceBasedAnalyzer.validate(relatedResponse(1, option1.getOptionValue(), "reviewText"))).isFalse();
+        assertThat(choiceBasedAnalyzer.validate(new AnalyzedResponse(1L, true, null, option1.getOptionValue(), "reviewText"))).isTrue();
+        assertThat(choiceBasedAnalyzer.validate(relatedResponse(1, option1.getOptionValue(), "reviewText"))).isTrue();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, null, "reviewText"))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, " ", "reviewText"))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, option1.getOptionValue(), null))).isFalse();
@@ -78,13 +79,14 @@ public class ChoiceBasedAnalyzerTest {
     }
 
     @Test
-    void validate시_isRelated가_false면_score는_0이고_choice와_phrase는_null이어야_한다() {
+    void validate시_isRelated가_false면_choice와_phrase는_null이어야_한다() {
         //given
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
 
         //then
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, null, null))).isTrue();
-        assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(1, null, null))).isFalse();
+        assertThat(choiceBasedAnalyzer.validate(new AnalyzedResponse(1L, false, null, null, null))).isTrue();
+        assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(1, null, null))).isTrue();
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, option1.getOptionValue(), null))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, null, "reviewText"))).isFalse();
     }
@@ -100,13 +102,13 @@ public class ChoiceBasedAnalyzerTest {
         AnalyzedResponse invalidUnrelatedResponse = unrelatedResponse(0, option1.getOptionValue(), null);
 
         given(characteristicOptionRepository.findByCharacteristicId(characteristic.getId())).willReturn(options);
-        given(analyzerExecutor.execute(any(), any(), any(), any())).willReturn(List.of());
+        given(analyzerExecutor.execute(any(), any(), any(), any(), any())).willReturn(List.of());
 
         //when
         choiceBasedAnalyzer.analyze(characteristic, List.of(review));
 
         //then
-        verify(analyzerExecutor).execute(any(), any(), any(), validatorCaptor.capture());
+        verify(analyzerExecutor).execute(any(), any(), any(), any(), validatorCaptor.capture());
         Predicate<AnalyzedResponse> validator = validatorCaptor.getValue();
 
         assertThat(validator.test(validRelatedResponse)).isTrue();

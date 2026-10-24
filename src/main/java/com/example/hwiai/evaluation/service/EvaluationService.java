@@ -19,7 +19,15 @@ public class EvaluationService {
     }
 
     public void saveAll(List<Evaluation> evaluations) {
-        evaluationRepository.saveAll(evaluations);
+        try {
+            evaluationRepository.saveAllAndFlush(evaluations);
+        } catch (DataIntegrityViolationException ex) {
+            ConstraintViolationException constraintViolation = findConstraintViolation(ex);
+            if (constraintViolation != null) {
+                throw new UniqueConstraintViolationException(constraintViolation.getConstraintName());
+            }
+            throw ex;
+        }
     }
 
     public boolean existsByReviewIdAndCharacteristicId(Long productId, Long characteristicId) {
@@ -35,6 +43,17 @@ public class EvaluationService {
             }
             throw ex;
         }
+    }
+
+    private ConstraintViolationException findConstraintViolation(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof ConstraintViolationException constraintViolation) {
+                return constraintViolation;
+            }
+            current = current.getCause();
+        }
+        return null;
     }
     
     public List<Evaluation> findByReviewProductIdAndCharacteristicIdAndIsRelatedTrue(Long productId, Long characteristicId) {

@@ -20,13 +20,7 @@ public class CharacteristicService {
 	}
 
     public List<Characteristic> findByIsActiveTrue() {
-        List<Characteristic> characteristics = characteristicRepository.findByIsActiveTrue();
-
-        if(characteristics.size() == 0) {
-            throw new RuntimeException("No active characteristics found");
-        }
-
-        return characteristics;
+        return characteristicRepository.findByIsActiveTrue();
     }
     
 }

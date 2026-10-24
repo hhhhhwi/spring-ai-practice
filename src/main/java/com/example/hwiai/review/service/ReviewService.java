@@ -22,14 +22,8 @@ public class ReviewService {
         this.productRepository = productRepository;
     }
 
-    public List<Review> findByProductIdAndTextIsNotNull(Long productId) {
-        List<Review> reviews = reviewRepository.findByProductIdAndTextIsNotNull(productId);
-
-        if (reviews.size() == 0) {
-            throw new RuntimeException("No reviews with text found for product ID: " + productId);
-        }
-
-        return reviews;
+    public List<Review> findAnalyzableByProductId(Long productId) {
+        return reviewRepository.findAnalyzableByProductId(productId);
     }
 
     public List<Review> findByProductId(Long productId) {
