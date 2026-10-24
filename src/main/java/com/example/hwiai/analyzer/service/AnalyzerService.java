@@ -66,7 +66,6 @@ public class AnalyzerService {
         .collect(Collectors.toMap(Review::getId, review -> review));
 
         List<Evaluation> allEvaluations = new ArrayList<>();
-        boolean hasAnalysisTarget = false;
 
         for (Characteristic characteristic : characteristics) {
             List<Review> targetReviews = findReviewsWithoutEvaluation(reviews, characteristic.getId());
@@ -74,8 +73,6 @@ public class AnalyzerService {
                 log.info("No analysis target. productId={}, characteristicId={}", productId, characteristic.getId());
                 continue;
             }
-            hasAnalysisTarget = true;
-
             Set<Long> requestedReviewIds = targetReviews.stream()
                     .map(Review::getId)
                     .collect(Collectors.toCollection(HashSet::new));
@@ -95,10 +92,6 @@ public class AnalyzerService {
                     Evaluation evaluation = createEvaluation(review, characteristic, response);
                     allEvaluations.add(evaluation);
                 });
-        }
-
-        if (!hasAnalysisTarget) {
-            throw new AnalysisPreconditionException("No unevaluated reviews found for active characteristics. productId=" + productId);
         }
 
         evaluationService.saveAll(allEvaluations);
