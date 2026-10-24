@@ -1,5 +1,6 @@
 package com.example.hwiai.analyzer.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -86,13 +87,14 @@ class AnalyzerServiceTest {
     }
 
     @Test
-    void 분석_가능한_리뷰가_없으면_LLM을_호출하지_않는다() {
+    void 분석_가능한_리뷰가_없으면_성공_처리하고_LLM을_호출하지_않는다() {
         given(reviewService.findAnalyzableByProductId(1L)).willReturn(List.of());
+        given(characteristicService.findByIsActiveTrue()).willReturn(List.of(characteristic));
 
-        assertThatThrownBy(() -> analyzerService.analyze(1L))
-                .isInstanceOf(AnalysisPreconditionException.class);
+        assertThatCode(() -> analyzerService.analyze(1L)).doesNotThrowAnyException();
 
         verify(analyzer, never()).analyze(any(), any());
+        verify(evaluationService, never()).saveAll(any());
     }
 
     private Characteristic characteristic(Long id) {

@@ -30,6 +30,10 @@ public class ScoreBasedAnalyzer implements CharacteristicAnalyzer {
 
     @Override
     public boolean validate(AnalyzedResponse response) {
+        if (response.getScoreValue() == null) {
+            return false;
+        }
+
         if (response.isRelated()) {
             return response.getScoreValue() >= 1
                     && response.getScoreValue() <= 5

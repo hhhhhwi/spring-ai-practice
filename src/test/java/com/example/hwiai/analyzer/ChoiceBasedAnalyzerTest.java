@@ -64,13 +64,14 @@ public class ChoiceBasedAnalyzerTest {
     }
 
     @Test
-    void validate시_isRelated가_true면_score는_0이고_choice와_phrase는_비어있지_않아야_한다() {
+    void validate시_isRelated가_true면_choice와_phrase는_비어있지_않아야_한다() {
         //given
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
 
         //then
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, option1.getOptionValue(), "reviewText"))).isTrue();
-        assertThat(choiceBasedAnalyzer.validate(relatedResponse(1, option1.getOptionValue(), "reviewText"))).isFalse();
+        assertThat(choiceBasedAnalyzer.validate(new AnalyzedResponse(1L, true, null, option1.getOptionValue(), "reviewText"))).isTrue();
+        assertThat(choiceBasedAnalyzer.validate(relatedResponse(1, option1.getOptionValue(), "reviewText"))).isTrue();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, null, "reviewText"))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, " ", "reviewText"))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(relatedResponse(0, option1.getOptionValue(), null))).isFalse();
@@ -78,13 +79,14 @@ public class ChoiceBasedAnalyzerTest {
     }
 
     @Test
-    void validate시_isRelated가_false면_score는_0이고_choice와_phrase는_null이어야_한다() {
+    void validate시_isRelated가_false면_choice와_phrase는_null이어야_한다() {
         //given
         ChoiceBasedAnalyzer choiceBasedAnalyzer = new ChoiceBasedAnalyzer(analyzerExecutor, characteristicOptionRepository);
 
         //then
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, null, null))).isTrue();
-        assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(1, null, null))).isFalse();
+        assertThat(choiceBasedAnalyzer.validate(new AnalyzedResponse(1L, false, null, null, null))).isTrue();
+        assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(1, null, null))).isTrue();
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, option1.getOptionValue(), null))).isFalse();
         assertThat(choiceBasedAnalyzer.validate(unrelatedResponse(0, null, "reviewText"))).isFalse();
     }

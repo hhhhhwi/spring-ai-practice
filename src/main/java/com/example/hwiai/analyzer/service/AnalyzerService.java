@@ -53,13 +53,14 @@ public class AnalyzerService {
         }
 
         List<Review> reviews = reviewService.findAnalyzableByProductId(productId);
-        if (reviews.isEmpty()) {
-            throw new AnalysisPreconditionException("No analyzable reviews found for productId=" + productId);
-        }
-
         List<Characteristic> characteristics = characteristicService.findByIsActiveTrue();
         if (characteristics.isEmpty()) {
             throw new AnalysisPreconditionException("No active characteristics found");
+        }
+
+        if (reviews.isEmpty()) {
+            log.info("No analyzable reviews. productId={}", productId);
+            return;
         }
 
         Map<Long, Review> reviewById = reviews.stream()
